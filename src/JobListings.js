@@ -1,11 +1,16 @@
 // JobListings.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './JobListings.css';
 import JobCard from './JobCard';
+import mongoose from 'mongoose'; // Import Mongoose
+import connectDB from './connectDB.js';
 
 const JobListings = ({ jobListings }) => {
   // Initialize the state for job listings
-  const [jobListingsState, setJobListings] = useState(jobListings);
+  useEffect(() => {
+    connectDB();
+  }, []);
+  const [jobListingsState, setJobListings] = useState([]);
   const [newJob, setNewJob] = useState({
     id: null,
     company: '',
@@ -14,31 +19,38 @@ const JobListings = ({ jobListings }) => {
     isFeatured: false,
     isNew: false,
   });
+  
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const Job = mongoose.model('Job'); // Access the Job model
+        const response = await Job.find(); // Fetch all jobs from MongoDB
+        setJobListings(response);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewJob({ ...newJob, [name]: value });
   };
 
-  const handleJobSubmission = (e) => {
+  const handleJobSubmission = async (e) => {
     e.preventDefault();
-    // Create a new job listing object with the input values
-    const nextId = jobListingsState.length + 1;
-    const updatedJobListings = [
-      ...jobListingsState,
-      { ...newJob, id: nextId },
-    ];
-    // Update the state with the new job listings
-    setJobListings(updatedJobListings);
-    // Clear the form fields
-    setNewJob({
-      id: null,
-      company: '',
-      title: '',
-      location: '',
-      isFeatured: false,
-      isNew: false,
-    });
+    try {
+      const Job = mongoose.model('Job'); // Access the Job model
+      const newJob = new Job(newJob); // Create a new Job instance
+      await newJob.save(); // Save the new job document to MongoDB
+  
+      // ... (rest of the code remains the same)
+    } catch (error) {
+      console.error('Error submitting job:', error);
+    }
   };
 
   return (
@@ -77,5 +89,7 @@ const JobListings = ({ jobListings }) => {
     </div>
   );
 };
+
+connectDB();
 
 export default JobListings;

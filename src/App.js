@@ -1,34 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import Header from './Header';
 import JobListings from './JobListings';
+import store from './store'; // Import the Redux store
 
 const App = () => {
-  const [jobListings, setJobListings] = useState([
-    {
-      id: 1,
-      company: 'Twenix',
-      title: 'Online English Tutor',
-      location: 'Full-Time/Anywhere in the World',
-      isFeatured: true,
-      isNew: true,
-    },
-    {
-      id: 2,
-      company: 'Proxify AB',
-      title: 'Senior Symfony Developer',
-      location: 'Remote',
-      isFeatured: true,
-      isNew: true,
-    },
-    // Add more mock job listings here
-  ]);
-
   return (
-    <div>
+    <div className="App">
       <Header />
       <main>
-        <JobListings jobListings={jobListings} />
+        <JobListings />
       </main>
       <footer>
         {/* Footer content */}
